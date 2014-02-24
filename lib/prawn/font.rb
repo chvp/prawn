@@ -228,7 +228,7 @@ module Prawn
       else
         f = if options[:style]
               # override style with :style => :bold
-              find_font(@font ? @font.name : 'Helvetica',
+              find_font(@font ? @font.family : 'Helvetica',
                         :style => options[:style])
             else
               font
