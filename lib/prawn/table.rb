@@ -404,13 +404,31 @@ module Prawn
             "(max width #{cells.max_width}, requested #{width})"
         end
 
+        # WARNING, THE CODE ADAPTATIONS DONE HERE FOR 'BETTER' SCALING
+        # DON'T TAKE THE MIN_WIDTH OF THE COLUMNS INTO ACCOUNT
         if width - natural_width < -epsilon
-          # Shrink the table to fit the requested width.
-          f = (width - cells.min_width).to_f / (natural_width - cells.min_width)
+          equally_spread_width = width/column_length
+          small_enough_cells = []
+          too_big_cells = []
+          natural_column_widths.each do |w|
+            if w - equally_spread_width < -epsilon
+              small_enough_cells << w
+            else
+              too_big_cells << w
+            end
+          end
+
+          total_width_small_enough_cells =
+
+
+          f = (width - small_enough_cells.sum).to_f / (too_big_cells.sum)
 
           (0...column_length).map do |c|
-            min, nat = column(c).min_width, natural_column_widths[c]
-            (f * (nat - min)) + min
+            if natural_column_widths[c] - equally_spread_width < -epsilon
+              natural_column_widths[c]
+            else
+              f * natural_column_widths[c]
+            end
           end
         elsif width - natural_width > epsilon
           # Expand the table to fit the requested width.
