@@ -421,7 +421,7 @@ module Prawn
           total_width_small_enough_cells =
 
 
-          f = (width - small_enough_cells.sum).to_f / (too_big_cells.sum)
+          f = (width - small_enough_cells.inject(0, :+)).to_f / (too_big_cells.inject(0, :+))
 
           (0...column_length).map do |c|
             if natural_column_widths[c] - equally_spread_width < -epsilon
