@@ -297,6 +297,9 @@ module Prawn
         else
           object
         end
+      rescue PDF::Reader::MalformedPDFError, PDF::Reader::InvalidObjectError
+        msg = "Error reading template file. If you are sure it's a valid PDF, it may be a bug."
+        # don't raise when importing a pdf, just try to be robust.
       end
 
       ruby_18 do
