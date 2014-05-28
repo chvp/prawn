@@ -412,7 +412,7 @@ module Prawn
           too_big_cells = []
           natural_column_widths.each do |w|
             if w - equally_spread_width < -epsilon
-              small_enough_cells << w
+              small_enough_cells << w + 0.5
             else
               too_big_cells << w
             end
@@ -424,8 +424,8 @@ module Prawn
           f = (width - small_enough_cells.inject(0, :+)).to_f / (too_big_cells.inject(0, :+))
 
           (0...column_length).map do |c|
-            if natural_column_widths[c] - equally_spread_width < -epsilon
-              natural_column_widths[c]
+            if natural_column_widths[c] + 0.5 - equally_spread_width < -epsilon
+              natural_column_widths[c] + 0.5
             else
               f * natural_column_widths[c]
             end
