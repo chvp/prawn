@@ -28,6 +28,7 @@ module Prawn
             @fragments = []
             @unconsumed = []
             @kerning = options[:kerning]
+            @style = options[:style]
           end
 
           def space_count
@@ -275,7 +276,7 @@ module Prawn
           def set_fragment_measurements(fragment)
             apply_font_settings(fragment) do
               fragment.width = @document.width_of(fragment.text,
-                                                  :kerning => @kerning)
+                                                  :kerning => @kerning, :style => @style)
               fragment.line_height = @document.font.height
               fragment.descender = @document.font.descender
               fragment.ascender = @document.font.ascender
