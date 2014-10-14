@@ -34,7 +34,7 @@ module Prawn
       def layout
         return @layout if @layout
 
-        mb = dictionary.data[:MediaBox]
+        mb = dimensions
         if mb[3] > mb[2]
           :portrait
         else
@@ -139,7 +139,8 @@ module Prawn
       end
 
       def dimensions
-        return inherited_dictionary_value(:MediaBox) if imported_page?
+        # This default shouldn't be necesary, but some non compliant PDFs leave MediaBox out
+        return (inherited_dictionary_value(:MediaBox) || [0, 0, 595, 842]) if imported_page?
 
         coords = Prawn::Document::PageGeometry::SIZES[size] || size
         [0,0] + case(layout)
