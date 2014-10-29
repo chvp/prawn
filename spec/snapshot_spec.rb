@@ -64,6 +64,21 @@ describe "Prawn::Document#transaction" do
     pages.size.should == 1
   end
 
+  it "should give a valid page count when rolling back with a new page" do
+    pdf = Prawn::Document.new do
+      transaction do
+        start_new_page
+        text "way out there and will never be shown"
+        rollback
+      end
+      text "This is the real text, on the first page"
+    end
+
+    pdf.page_count.should == 1
+
+    pdf.render_file('test.pdf')
+  end
+
   it "should not propagate a RollbackTransaction outside its bounds" do
     def add_lines(pdf)
       100.times { |i| pdf.text "Line #{i}" }

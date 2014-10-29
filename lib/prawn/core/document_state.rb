@@ -62,7 +62,7 @@ module Prawn
       end
 
       def page_count
-        pages.length
+        store.pages.data[:Count]
       end
 
       def render_body(output)
