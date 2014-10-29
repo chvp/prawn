@@ -54,7 +54,8 @@ module Prawn
          :bounds          => bounds.deep_copy,
          :page_number     => page_number,
          :page_kids       => state.store.pages.data[:Kids].compact.map{|kid| kid.identifier},
-         :dests           => names? && names.data[:Dests].deep_copy}
+         :dests           => names? && names.data[:Dests].deep_copy,
+         :color_space     => graphic_state.color_space.dup }
       end
 
       # Rolls the page state back to the state of the given snapshot.
@@ -78,6 +79,7 @@ module Prawn
         state.store.pages.data[:Count] = shot[:page_kids].size
 
         self.bounds = BoundingBox.restore_deep_copy(shot[:bounds], self)
+        graphic_state.color_space = shot[:color_space]
 
         if shot[:dests]
           names.data[:Dests] = shot[:dests] 

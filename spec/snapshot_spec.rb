@@ -79,6 +79,17 @@ describe "Prawn::Document#transaction" do
     pdf.render_file('test.pdf')
   end
 
+  it "should reset the color space when rolling back" do
+    pdf = Prawn::Document.new do
+      transaction do
+        stroke_color('FFFFF')
+        rollback
+      end
+    end
+
+    pdf.graphic_state.color_space.should == {}
+  end
+
   it "should not propagate a RollbackTransaction outside its bounds" do
     def add_lines(pdf)
       100.times { |i| pdf.text "Line #{i}" }
