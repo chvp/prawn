@@ -246,7 +246,7 @@ module Prawn
 
     # Draws the table onto the document at the document's current y-position.
     #
-    def draw
+    def draw(options = {})
       with_position do
         # The cell y-positions are based on an infinitely long canvas. The offset
         # keeps track of how much we have to add to the original, theoretical
@@ -310,8 +310,9 @@ module Prawn
         cells_this_page = []
 
         @cells.each do |cell|
-          if cell.height > (cell.y + offset) - ref_bounds.absolute_bottom &&
-             cell.row > started_new_page_at_row
+          if (cell.height > (cell.y + offset) - ref_bounds.absolute_bottom &&
+             cell.row > started_new_page_at_row) ||
+             (options[:page_splits] && cell.column == 1 && options[:page_splits].include?(cell.row))
             # Ink all cells on the current page
             if @before_rendering_page
               c = Cells.new(cells_this_page.map { |c, _| c })
