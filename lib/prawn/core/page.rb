@@ -140,7 +140,17 @@ module Prawn
 
       def dimensions
         # This default shouldn't be necesary, but some non compliant PDFs leave MediaBox out
-        return (inherited_dictionary_value(:MediaBox) || [0, 0, 595, 842]) if imported_page?
+        if imported_page?
+          if inherited_dictionary_value(:MediaBox)
+            if inherited_dictionary_value(:MediaBox).is_a?(Prawn::Core::Reference)
+              return inherited_dictionary_value(:MediaBox).data
+            else
+              return inherited_dictionary_value(:MediaBox)
+            end
+          else
+            return [0, 0, 595, 842]
+          end
+        end
 
         coords = Prawn::Document::PageGeometry::SIZES[size] || size
         [0,0] + case(layout)
