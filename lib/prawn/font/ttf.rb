@@ -220,7 +220,7 @@ module Prawn
 
         # Some TTF fonts have nonzero widths for \n (UTF-8 / ASCII code: 10).
         # Patch around this as we'll never be drawing a newline with a width.
-        return 0.0 if code == 10
+        return 0.0 if code == 10 || code == 13
 
         @char_widths[code] ||= Integer(hmtx.widths[cmap[code]] * scale_factor)
       end                   
