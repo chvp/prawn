@@ -49,7 +49,10 @@ module Prawn
         # current_page holds a ref to the Pages dictionary which grows
         # monotonically as data is added to the document, so we share that
         # between the old and new copies.
+        extra_page_contents = (state.page.dictionary.data[:Contents] - [state.page.content]) if state.page.dictionary.data[:Contents].is_a?(Array)
+
         {:page_content    => state.page.content.respond_to?(:deep_copy) ?  state.page.content.deep_copy :  state.page.content.clone,
+         :extra_page_contents => extra_page_contents,
          :current_page    => state.page.dictionary.deep_copy(share=[:Parent]),
          :bounds          => bounds.deep_copy,
          :page_number     => page_number,
@@ -71,7 +74,12 @@ module Prawn
 
         page.dictionary = shot[:current_page].identifier
         page.dictionary.replace shot[:current_page]
-        page.dictionary.data[:Contents] = page.content
+
+        if shot[:extra_page_contents]
+          page.dictionary.data[:Contents] = shot[:extra_page_contents] << page.content
+        else
+          page.dictionary.data[:Contents] = page.content
+        end
 
         self.page_number = shot[:page_number]
 

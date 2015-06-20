@@ -23,7 +23,7 @@ describe "Prawn::Document#transaction" do
     end
     text = PDF::Inspector::Text.analyze(pdf.render)
     text.strings.should == []
-  end 
+  end
 
   it "should return true/false value indicating success of the transaction" do
     Prawn::Document.new do
@@ -34,7 +34,7 @@ describe "Prawn::Document#transaction" do
       success.should == false
     end
   end
-  
+
   it "should support nested transactions" do
     pdf = Prawn::Document.new do
       transaction do
@@ -170,7 +170,7 @@ describe "Prawn::Document#transaction" do
       lambda { pdf.transaction{} }.should_not raise_error
     end
   end
-  
+
   describe "with a stamp dictionary present" do
 
     it "should properly commit if no error is raised" do
@@ -193,7 +193,7 @@ describe "Prawn::Document#transaction" do
         end
       end
       pdf.render.should_not =~ /\/Stamp1 Do/
-    end 
+    end
 
   end
 
@@ -208,5 +208,16 @@ describe "Prawn::Document#transaction" do
     end
   end
 
+  it "should restore multiple content streams" do
+    pdf = Prawn::Document.new(page_size: "A4", skip_page_creation: true);
+    pdf.start_new_page(:template => "#{Prawn::BASEDIR}/spec/data/curves.pdf", :template_page => 1, size: "A4")
+    pdf.text 'test 1'
+    pdf.transaction{pdf.text 'test 2'; pdf.rollback}
+    output = StringIO.new(pdf.render)
+    hash = PDF::Reader::ObjectHash.new(output)
+    pages = hash.values.find {|obj| obj.is_a?(Hash) && obj[:Type] == :Pages}[:Kids]
+    template_page = hash[pages[0]]
+    template_page[:Contents].size.should == 2
+  end
 end
 
