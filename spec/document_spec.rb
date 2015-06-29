@@ -265,8 +265,8 @@ describe "When reopening pages" do
 
     # MalformedPDFError raised if content stream actual length does not match
     # dictionary length
-    lambda{ PDF::Inspector::Page.analyze(@pdf.render) }.
-      should_not raise_error(PDF::Reader::MalformedPDFError)
+    expect{ PDF::Inspector::Page.analyze(@pdf.render) }.
+      not_to raise_error()
   end
 
   it "should insert pages after the current page when calling start_new_page" do
@@ -396,13 +396,13 @@ describe "The group() feature" do
   end
 
   it "should_not raise_error CannotGroup if the content is too tall" do
-    lambda {
+    expect {
       Prawn::Document.new do
         group do
           100.times { text "Too long" }
         end
       end.render
-    }.should_not raise_error(Prawn::Errors::CannotGroup)
+    }.not_to raise_error()
   end
 
   it "should bundle grouped content if it can fit on one page" do
@@ -413,6 +413,7 @@ describe "The group() feature" do
         100.times { text "Too long" }
       end
     end
+    # pdf.render_file('fit_one_page_test.pdf')
     pages = PDF::Inspector::Page.analyze(pdf.render).pages
     pages.size.should == 3
     pages[1][:strings].first.should == 'title'
@@ -428,9 +429,26 @@ describe "The group() feature" do
         end
       end
     end
+    # pdf.render_file('nested_grouped_content.pdf')
     pages = PDF::Inspector::Page.analyze(pdf.render).pages
     pages.size.should == 3
-    pages[1][:strings].first.should == 'Too long'
+    pages[1][:strings].first.should == 'title'
+  end
+
+  it "should bundle nested grouped content" do
+    pdf = Prawn::Document.new do
+      40.times { text 'pre content' }
+      group do
+        text 'title'
+        group do
+          40.times { text "Too long" }
+        end
+      end
+    end
+    # pdf.render_file('nested_content.pdf')
+    pages = PDF::Inspector::Page.analyze(pdf.render).pages
+    pages.size.should == 2
+    pages[1][:strings].first.should == 'title'
   end
 
   it "should jump pages when there's not a lot of place left" do
@@ -443,6 +461,7 @@ describe "The group() feature" do
         end
       end
     end
+    # pdf.render_file('not_much_place.pdf')
     pages = PDF::Inspector::Page.analyze(pdf.render).pages
     pages.size.should == 3
     pages[1][:strings].first.should == 'title'

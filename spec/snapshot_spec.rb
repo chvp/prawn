@@ -76,7 +76,7 @@ describe "Prawn::Document#transaction" do
 
     pdf.page_count.should == 1
 
-    pdf.render_file('test.pdf')
+    # pdf.render_file('test.pdf')
   end
 
   it "should reset the color space when rolling back" do

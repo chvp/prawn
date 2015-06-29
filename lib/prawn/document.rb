@@ -523,13 +523,12 @@ module Prawn
       @bounding_box = SimpleDelegator.new(@bounding_box)
 
       @group_level ||= 0
+      @root_group_second_attempt = second_attempt if @group_level == 0
       @group_level += 1
 
       def @bounding_box.move_past_bottom
         raise RollbackTransaction
       end
-
-      second_attempt ||= @group_level > 1
 
       starting_page = page_number
       starting_cursor = cursor
@@ -537,25 +536,25 @@ module Prawn
       success = transaction { yield }
 
       @bounding_box = old_bounding_box
+      @group_level -= 1
 
       unless success
         if second_attempt
-          if (bounds.height-starting_cursor)/bounds.height > 0.8
-            go_to_page(starting_page)
-            old_bounding_box.move_past_bottom
-            yield
-          else
-            go_to_page(starting_page)
-            move_cursor_to(starting_cursor)
-            yield
+          go_to_page(starting_page)
+          move_cursor_to(starting_cursor)
+          yield
+        elsif @group_level > 0
+          go_to_page(starting_page)
+          move_cursor_to(starting_cursor)
+          yield
+          if page_number > starting_page && !@root_group_second_attempt
+            rollback
           end
         else
           old_bounding_box.move_past_bottom
-          group(second_attempt=true) { yield }
+          group(@root_group_second_attempt=true) { yield }
         end
       end
-
-      @group_level -= 1
 
       success
     end
