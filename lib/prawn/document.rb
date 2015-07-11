@@ -532,6 +532,7 @@ module Prawn
 
       starting_page = page_number
       starting_cursor = cursor
+      starting_y = y
 
       success = transaction { yield }
 
@@ -551,7 +552,12 @@ module Prawn
             rollback
           end
         else
-          old_bounding_box.move_past_bottom
+          if starting_y != @bounding_box.absolute_top || old_bounding_box.is_a?(Prawn::Document::ColumnBox)
+            old_bounding_box.move_past_bottom
+          else
+            go_to_page(starting_page)
+            move_cursor_to(starting_cursor)
+          end
           group(@root_group_second_attempt=true) { yield }
         end
       end

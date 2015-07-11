@@ -467,7 +467,24 @@ describe "The group() feature" do
     pages[1][:strings].first.should == 'title'
   end
 
-   it "should group within individual column boxes" do
+  it "works correctly when grouping landscape stuff" do
+    pdf = Prawn::Document.new do
+      45.times { text 'pre content' }
+      start_new_page(:layout => :portrait)
+      group do
+        text 'title'
+        group do
+          100.times { text "Too long" }
+        end
+      end
+    end
+    pdf.render_file('grouping_landscape.pdf')
+    pages = PDF::Inspector::Page.analyze(pdf.render).pages
+    pages.size.should == 3
+    pages[1][:strings].first.should == 'title'
+  end
+
+  it "should group within individual column boxes" do
     pdf = Prawn::Document.new do
       # Set up columns with grouped blocks of 0..49. 0 to 49 is slightly short
       # of the height of one page / column, so each column should get its own
