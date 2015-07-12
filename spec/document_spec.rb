@@ -467,7 +467,7 @@ describe "The group() feature" do
     pages[1][:strings].first.should == 'title'
   end
 
-  it "works correctly when grouping landscape stuff" do
+  it "doesn't jump to the new page when it's already a new page" do
     pdf = Prawn::Document.new do
       45.times { text 'pre content' }
       start_new_page(:layout => :portrait)
@@ -478,7 +478,7 @@ describe "The group() feature" do
         end
       end
     end
-    pdf.render_file('grouping_landscape.pdf')
+    # pdf.render_file('grouping_new_page.pdf')
     pages = PDF::Inspector::Page.analyze(pdf.render).pages
     pages.size.should == 3
     pages[1][:strings].first.should == 'title'
