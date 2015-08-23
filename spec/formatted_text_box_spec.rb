@@ -32,7 +32,7 @@ describe "Text::Formatted::Box wrapping" do
       text_box = Prawn::Text::Formatted::Box.new(texts, :document => @pdf, :width => @pdf.width_of("Hello World"))
       lambda {
         text_box.render
-      }.should_not raise_error(Encoding::CompatibilityError)
+      }.should_not raise_error
     end
   end
 
@@ -84,7 +84,7 @@ describe "Text::Formatted::Box wrapping" do
     }.should_not raise_error
     text_box.text.should == "Noua Delineatio Geographica\ngeneralis | Apostolicarum\nperegrinationum | S FRANCISCI\nXAUERII | Indiarum & Iaponi\346\nApostoli"
   end
-  
+
   describe "Unicode" do
     before do
       if RUBY_VERSION < '1.9'
@@ -96,7 +96,7 @@ describe "Text::Formatted::Box wrapping" do
         Encoding.default_internal = Encoding::UTF_8
       end
     end
-    
+
     after do
       if RUBY_VERSION < '1.9'
         $KCODE=@reset_value
@@ -397,7 +397,7 @@ describe "Text::Formatted::Box#render" do
              { :text => "callback now",
                :callback => [behind, in_front] }]
     text_box = Prawn::Text::Formatted::Box.new(array, :document => @pdf)
-    lambda { text_box.render }.should_not raise_error(NoMethodError)
+    lambda { text_box.render }.should_not raise_error
   end
   it "should be able to set the font" do
     create_pdf

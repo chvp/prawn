@@ -220,7 +220,7 @@ describe "Prawn::Table" do
     it "should ignore non-setter methods" do
       lambda {
         @table.cells.content_width
-      }.should raise_error(NoMethodError)
+      }.should raise_error
     end
 
     it "skips cells that don't respond to the given method" do
@@ -437,7 +437,7 @@ describe "Prawn::Table" do
             t.cells.size = 8
             t.cells.padding = 0
           end
-        end.should_not raise_error(Prawn::Errors::CannotFit)
+        end.should_not raise_error
       end
 
       it "should be the width of the :width parameter" do
