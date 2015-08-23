@@ -90,6 +90,30 @@ describe "Prawn::Document#transaction" do
     pdf.graphic_state.color_space.should == {}
   end
 
+  it "should set the color space after a roll back" do
+    require "tempfile"
+    pdf = Prawn::Document.new do
+      start_new_page(:layout => :landscape)
+
+      group do
+        fill_color '000000'
+
+        group do
+          %w{3 2 1 a b c d e  f  g  h  i  j  k  l  m  n  o  p  q  r  s  t  u  v  w  x y z}.each do |f|
+            text f
+            text f
+          end
+        end
+      end
+    end
+
+    tempfile = Tempfile.new("generate_test")
+
+    pdf.render_file(tempfile)
+    output = `gs -o /dev/null -sDEVICE=nullpage #{tempfile.path} 2>&1`
+    output.should_not include('errors')
+  end
+
   it "should not propagate a RollbackTransaction outside its bounds" do
     def add_lines(pdf)
       100.times { |i| pdf.text "Line #{i}" }

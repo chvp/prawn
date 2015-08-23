@@ -534,6 +534,8 @@ module Prawn
       starting_cursor = cursor
       starting_y = y
 
+      previous_graphic_state = state.page.stack.stack.map{|g| GraphicState.new(g)}
+
       success = transaction { yield }
 
       @bounding_box = old_bounding_box
@@ -542,10 +544,12 @@ module Prawn
       unless success
         if second_attempt
           go_to_page(starting_page)
+          state.page.stack.stack = previous_graphic_state
           move_cursor_to(starting_cursor)
           yield
         elsif @group_level > 0
           go_to_page(starting_page)
+          state.page.stack.stack = previous_graphic_state
           move_cursor_to(starting_cursor)
           yield
           if page_number > starting_page && !@root_group_second_attempt
@@ -556,6 +560,7 @@ module Prawn
             old_bounding_box.move_past_bottom
           else
             go_to_page(starting_page)
+            state.page.stack.stack = previous_graphic_state
             move_cursor_to(starting_cursor)
           end
           group(@root_group_second_attempt=true) { yield }
