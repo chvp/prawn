@@ -519,7 +519,6 @@ module Prawn
     # the current page or column.
     #
     def group(second_attempt=false)
-      old_bounding_box = @bounding_box
       @bounding_box = SimpleDelegator.new(@bounding_box)
 
       @group_level ||= 0
@@ -538,7 +537,7 @@ module Prawn
 
       success = transaction { yield }
 
-      @bounding_box = old_bounding_box
+      @bounding_box = @bounding_box.__getobj__ if @bounding_box.respond_to?(:__getobj__)
       @group_level -= 1
 
       unless success
@@ -556,8 +555,8 @@ module Prawn
             rollback
           end
         else
-          if starting_y != @bounding_box.absolute_top || old_bounding_box.is_a?(Prawn::Document::ColumnBox)
-            old_bounding_box.move_past_bottom
+          if starting_y != @bounding_box.absolute_top || @bounding_box.is_a?(Prawn::Document::ColumnBox)
+            @bounding_box.move_past_bottom
           else
             go_to_page(starting_page)
             state.page.stack.stack = previous_graphic_state

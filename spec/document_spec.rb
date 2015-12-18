@@ -495,13 +495,27 @@ describe "The group() feature" do
         end
       end
     end
-
     # Second page should start with a 0 because it's a new group.
     pages = PDF::Inspector::Page.analyze(pdf.render).pages
     pages.size.should == 2
     pages[1][:strings].first.should == '0'
   end
 
+  it "should set the correct bounding box when going to a new page in a group" do
+    pdf = Prawn::Document.new do
+      start_new_page(layout: :landscape)
+      text "first page"
+      group do
+        start_new_page(layout: :portrait)
+        text "second page"
+      end
+      start_new_page(layout: :portrait)
+      text "third page"
+    end
+    pdf.bounds.width.should == 540.0
+    pdf.bounds.height.should == 720.0
+    # pdf.render_file('double_grouping_in_toc.pdf');`open double_grouping_in_toc.pdf`
+  end
 end
 
 describe "The render() feature" do
