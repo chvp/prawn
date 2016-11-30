@@ -312,7 +312,7 @@ module Prawn
         @cells.each do |cell|
           if (cell.height > (cell.y + offset) - ref_bounds.absolute_bottom &&
              cell.row > started_new_page_at_row) ||
-             (options[:page_splits] && cell.column == 1 && options[:page_splits].include?(cell.row))
+             (options[:page_splits] && cell.column == 0 && options[:page_splits].include?(cell.row))
             # Ink all cells on the current page
             if @before_rendering_page
               c = Cells.new(cells_this_page.map { |c, _| c })
