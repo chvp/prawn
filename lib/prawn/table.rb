@@ -433,7 +433,7 @@ module Prawn
           end
         elsif width - natural_width > epsilon
           # Expand the table to fit the requested width.
-          f = (width - natural_column_widths.sum).to_f / (cells.max_width - cells.width)
+          f = (width - natural_column_widths.inject(0, :+)).to_f / (cells.max_width - cells.width)
 
           (0...column_length).map do |c|
             nat, max = natural_column_widths[c], column(c).max_width
