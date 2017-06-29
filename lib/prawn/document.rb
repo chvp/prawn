@@ -351,8 +351,12 @@ module Prawn
     def float
       original_page = page_number
       original_y = y
+      original_bb = @bounding_box
       yield
-      go_to_page(original_page) unless page_number == original_page
+      unless page_number == original_page
+        go_to_page(original_page)
+        self.bounds = original_bb if original_bb
+      end
       self.y = original_y
     end
 
