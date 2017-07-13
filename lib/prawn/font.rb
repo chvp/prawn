@@ -374,9 +374,15 @@ module Prawn
     def generate_unique_id
       offset, id = 0, nil
 
+      # Don't attempt to generate id's less than this value.
+      # This is a workaround for an issue regarding importing pdfs
+      # that contain embedded fonts that don't have all glyphs.
+      # Fixes https://github.com/GetSilverfin/silverfin/issues/2112
+      safety_margin = 10
+
       while id.nil? || page_contains_font_id?(id)
         offset += 1
-        id = :"F#{@document.font_registry.size + offset}"
+        id = :"F#{@document.font_registry.size + offset + safety_margin}"
       end
 
       id
