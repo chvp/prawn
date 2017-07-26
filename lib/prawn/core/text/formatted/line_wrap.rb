@@ -93,8 +93,7 @@ module Prawn
                 if segment == zero_width_space
                   segment_width = 0
                 else
-                  style = @arranger.font_style(@arranger.current_format_state[:styles])
-                  segment_width = @document.width_of(segment, :kerning => @kerning, :style => style)
+                  segment_width = @document.width_of(segment, :kerning => @kerning)
                 end
 
                 if @accumulated_width + segment_width <= @width
