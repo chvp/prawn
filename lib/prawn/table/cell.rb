@@ -735,6 +735,9 @@ module Prawn
 
             next if border_width <= 0
 
+            @pdf.line_width   = border_width
+            @pdf.stroke_color = border_color
+
             # Left and right borders are drawn one-half border beyond the center
             # of the corner, so that the corners end up square.
             from, to = case border
@@ -776,8 +779,6 @@ module Prawn
               raise ArgumentError, "border_line must be :solid, :double, :dotted or :dashed"
             end
 
-            @pdf.line_width   = border_width
-            @pdf.stroke_color = border_color
             @pdf.stroke_line(from, to)
             @pdf.undash
           end
