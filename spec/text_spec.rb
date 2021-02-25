@@ -427,4 +427,22 @@ describe "#text" do
       @pdf.text "VAT", :kerning => false
     end
   end
+
+  describe "fallback_fonts" do
+    it "should preserve font style" do
+      create_pdf
+
+      @pdf.fallback_fonts ["Helvetica"]
+      @pdf.font "Times-Roman", :style => :italic do
+        @pdf.text "hello"
+      end
+
+      text = PDF::Inspector::Text.analyze(@pdf.render)
+      fonts_used = text.font_settings.map { |e| e[:name] }
+
+      fonts_used.length.should == 1
+      fonts_used[0].should == :"Times-Italic"
+      text.strings[0].should == "hello"
+    end
+  end
 end
