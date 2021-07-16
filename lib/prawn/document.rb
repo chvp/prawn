@@ -523,6 +523,7 @@ module Prawn
     # the current page or column.
     #
     def group(second_attempt=false)
+      starting_margin_box = @bounding_box
       @bounding_box = SimpleDelegator.new(@bounding_box)
 
       @group_level ||= 0
@@ -548,11 +549,13 @@ module Prawn
 
       unless success
         if second_attempt
+          @margin_box = starting_margin_box
           go_to_page(starting_page)
           state.page.stack.stack = previous_graphic_state
           move_cursor_to(starting_cursor)
           yield
         elsif @group_level > 0
+          @margin_box = starting_margin_box
           go_to_page(starting_page)
           state.page.stack.stack = previous_graphic_state
           move_cursor_to(starting_cursor)
@@ -564,6 +567,7 @@ module Prawn
           if starting_y != @bounding_box.absolute_top || @bounding_box.is_a?(Prawn::Document::ColumnBox)
             @bounding_box.move_past_bottom
           else
+            @margin_box = starting_margin_box
             go_to_page(starting_page)
             state.page.stack.stack = previous_graphic_state
             move_cursor_to(starting_cursor)
