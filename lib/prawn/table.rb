@@ -301,8 +301,10 @@ module Prawn
             @header.times do |r|
               row(r).each { |cell| @header_row[cell.row, cell.column] = cell.dup }
             end
+            last_header_row = @header - 1 # 0-indexed
           else
             row(0).each { |cell| @header_row[cell.row, cell.column] = cell.dup }
+            last_header_row = 0
           end
         end
 
@@ -311,6 +313,7 @@ module Prawn
         cells_this_page = []
 
         @cells.each do |cell|
+          skip_cell = false
           if (cell.height > (cell.y + offset) - ref_bounds.absolute_bottom &&
              cell.row > started_new_page_at_row) ||
              (options[:page_splits] && cell.column == 0 && options[:page_splits].include?(cell.row))
@@ -340,6 +343,14 @@ module Prawn
             end
             offset = @pdf.y - cell.y - header_height
             started_new_page_at_row = cell.row
+          elsif @header && @hide_samepage_header && cell.row <= last_header_row # we want repeated headers but no first header (top of the page)
+            margin_of_error = 5.0
+            if @pdf.y < (@pdf.bounds.height + @pdf.bounds.absolute_bottom - 0.001 - margin_of_error) # not at the top of the page (+ a margin of error)
+              # We're skipping the header, so recalculate the positions of all the
+              # subsequent rows - move them up to fill the space
+              @cells.filter { |c| c.row > cell.row && c.column == cell.column }.each { |c| c.y += cell.height }
+              skip_cell = true
+            end
           end
 
           # Don't modify cell.x / cell.y here, as we want to reuse the original
@@ -369,7 +380,7 @@ module Prawn
             cell.background_color ||= @row_colors[index % @row_colors.length]
           end
 
-          cells_this_page << [cell, [x, y]]
+          cells_this_page << [cell, [x, y]] unless skip_cell
           last_y = y
         end
         # Draw the last page of cells
