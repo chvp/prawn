@@ -6,6 +6,7 @@
 #
 module Prawn #:nodoc:
   VERSION = "1.0.0.rc2"
+  FLOAT_PRECISION = 1.0e-9
 end
 
 require "prawn/utilities"

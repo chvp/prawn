@@ -80,6 +80,34 @@ describe "Prawn::Table" do
 
     end
 
+    it "illustrates issue #710", :issue => 710 do
+      partial_width = 40
+      pdf = Prawn::Document.new({page_size: "LETTER", page_layout: :portrait})
+      col_widths = [
+        50,
+        partial_width, partial_width, partial_width, partial_width
+      ]
+
+      day_header = [{
+          content: "Monday, August 5th, A.S. XLIX",
+          colspan: 5,
+      }]
+
+      times = [{
+        content: "Loc",
+        colspan: 1,
+      }, {
+        content: "8:00",
+        colspan: 4,
+      }]
+
+      data = [ day_header ] + [ times ]
+
+      #raised a Prawn::Errors::CannotFit:
+      #Table's width was set larger than its contents' maximum width (max width 210, requested 218.0)
+      table = Prawn::Table.new data, pdf, :column_widths => col_widths
+    end
+
     it "illustrate issue #533" do
       data = [['', '', '', '', '',''],
               ['',{:content => '', :colspan => 5}]]
@@ -91,14 +119,35 @@ describe "Prawn::Table" do
       pdf = Prawn::Document.new
       first = {:content=>"Foooo fo foooooo",:width=>50,:align=>:center}
       second = {:content=>"Foooo",:colspan=>2,:width=>70,:align=>:center}
-      third = {:content=>"fooooooooooo, fooooooooooooo, fooo, foooooo fooooo",:width=>55,:align=>:center}
-      fourth = {:content=>"Bar",:width=>15,:align=>:center}
+      third = {:content=>"fooooooooooo, fooooooooooooo, fooo, foooooo fooooo",:width=>50,:align=>:center}
+      fourth = {:content=>"Bar",:width=>20,:align=>:center}
       table_content = [[
       first,
       [[second],[third,fourth]]
       ]]
       pdf.move_down(20)
+      table = Prawn::Table.new table_content, pdf
       pdf.table(table_content)
+    end
+
+    #https://github.com/prawnpdf/prawn/issues/407#issuecomment-28556698
+    it "correctly computes column widths with empty cells + colspan" do
+      data = [['', ''],
+              [{:content => '', :colspan => 2}]
+              ]
+      pdf = Prawn::Document.new
+
+      table = Prawn::Table.new data, pdf, :column_widths => [50, 200]
+      table.column_widths.should == [50.0, 200.0]
+    end
+
+    it "illustrates a variant of problem in issue #407 - comment 28556698" do
+      pdf = Prawn::Document.new
+      table_data = [["a", "b", "c"], [{:content=>"d", :colspan=>3}]]
+      column_widths = [50, 60, 400]
+
+      # Before we fixed #407, this line incorrectly raise a CannotFit error
+      pdf.table(table_data, :column_widths => column_widths)
     end
   end
 
