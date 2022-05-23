@@ -87,11 +87,23 @@ module Prawn
                            Prawn::FLOAT_PRECISION)
 
             if update_hash
-              # Split the width of colspanned cells evenly by columns
-              width_per_column = cell.width.to_f / cell.colspan
-              # Update the Hash
-              cell.colspan.times do |i|
-                @widths_by_column[cell.column + i] = width_per_column
+              # We want to divide the extra width among the cells but not make
+              # any cell shorter.
+              width_to_divide = cell.width.to_f
+              cells_to_divide_among = cell.colspan
+              # We'll sort the cells by length and look for a point where dividing
+              # the remaining width among the remaining cells makes all of them larger.
+              (cell.column...(cell.column + cell.colspan))
+                .sort_by { |index| @widths_by_column[index] }
+                .reverse
+                .each do |index|
+                avg_width = width_to_divide / cells_to_divide_among
+                if @widths_by_column[index] > avg_width
+                  width_to_divide -= @widths_by_column[index]
+                  cells_to_divide_among -= 1
+                else
+                  @widths_by_column[index] = avg_width
+                end
               end
             end
           end

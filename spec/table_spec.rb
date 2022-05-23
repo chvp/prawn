@@ -1293,6 +1293,20 @@ describe "colspan / rowspan" do
     heights[0].should == heights[1]
   end
 
+  it "doesn't make a large column below colspan smaller" do
+    t = @pdf.table(
+      [
+        [{:content => "Lorem ipsum dolor sit amet", :colspan => 3}],
+        ["Lorem ipsum dolor", "B", "C"]
+      ]
+    )
+
+    # Check that first is much wider than other two and other two are same.
+    expect(t.column_widths[0]).to be > 100
+    expect(t.column_widths[1]).to be < 50
+    expect(t.column_widths[2]).to be_within(0.01).of(t.column_widths[1])
+  end
+
   it "skips column numbers that have been col-spanned" do
     t = @pdf.table([["a", "b", {:content => "c", :colspan => 3}, "d"]])
     t.cells[0, 0].content.should == "a"
