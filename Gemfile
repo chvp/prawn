@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 gem "ttfunk", "~>1.0.3"
-gem "pdf-reader", "~> 1.2"
+gem "pdf-reader", "~> 2.14"
 gem "ruby-rc4"
 gem "afm"
 
